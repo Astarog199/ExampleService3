@@ -9,7 +9,6 @@ import android.os.Binder
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.util.Log
 import androidx.core.app.NotificationCompat
 
 
@@ -68,13 +67,14 @@ class ExampleService : Service() {
      fun startCountdown(): Int {
         counter = 20
         isRunning = true
+
          startForegroundService()
         handler.post(object : Runnable{
             override fun run() {
                 if (counter>0){
                     handler.postDelayed(this,1000)
                     counter--
-                    updateForegroundServiceCounter(counter)
+                    createNotification(counter)
                 }
                 else{
                     isRunning = false
@@ -87,22 +87,16 @@ class ExampleService : Service() {
     }
 
     private fun startForegroundService(){
-        val notification = NotificationCompat.Builder(this, channelId)
-            .setContentTitle("Service Samples")
-            .setContentText("Progress: $counter")
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentIntent(pendingIntent)
-            .build()
-
-        startForeground(notificationId, notification)
+        startForegroundService(notificationIntent)
     }
 
-    private fun updateForegroundServiceCounter(counter: Int) {
+    private fun createNotification(counter: Int) {
         val notification = NotificationCompat.Builder(this, channelId)
             .setContentTitle("Service Samples")
             .setContentText("Progress: $counter")
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentIntent(pendingIntent)
+            .setSilent(true)
             .build()
         notificationManager.notify(notificationId, notification)
     }
